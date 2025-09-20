@@ -12,12 +12,24 @@ import (
 func usage() {
 	fmt.Printf("Welcome to Z Coin\n\n")
 	fmt.Printf("Please use the following flags:\n\n")
-	fmt.Printf("-port=4000:		Set the PORT of the server\n")
-	fmt.Printf("-mode=rest:		Choose between 'html' and 'rest'\n\n")
+	fmt.Printf("rest:4000:		Set the PORT of the REST server\n")
+	fmt.Printf("html:4000:		Set the PORT of the HTML server\n")
 	// 프로그램을 종료시켜줌
 	// 0은 에러가 없다는 뜻이고
 	// 다른 숫자는 exit code를 보여줌
 	os.Exit(0)
+}
+
+func run(mode string, port int) {
+	switch mode {
+	case "rest":
+		rest.Start(port)
+	case "html":
+		explorer.Start(port)
+	default:
+		usage()
+	}
+
 }
 
 func Start() {
@@ -25,16 +37,19 @@ func Start() {
 		usage()
 	}
 
-	port := flag.Int("port", 4000, "Set port of the server")
-	mode := flag.String("mode", "rest", "Choose between 'html' and 'rest'")
+	cmd := os.Args[1]
 
-	flag.Parse()
-
-	switch *mode {
+	switch cmd {
 	case "rest":
-		rest.Start(*port)
+		restCmd := flag.NewFlagSet("rest", flag.ExitOnError)
+		port := restCmd.Int("port", 4000, "Set port of the server")
+		restCmd.Parse(os.Args[2:])
+		run("rest", *port)
 	case "html":
-		explorer.Start(*port)
+		htmlCmd := flag.NewFlagSet("html", flag.ExitOnError)
+		port := htmlCmd.Int("port", 4000, "Set port of the server")
+		htmlCmd.Parse(os.Args[2:])
+		run("html", *port)
 	default:
 		usage()
 	}
