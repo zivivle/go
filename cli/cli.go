@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/zivivle/go/explorer"
 	"github.com/zivivle/go/rest"
@@ -17,7 +18,7 @@ func usage() {
 	// 프로그램을 종료시켜줌
 	// 0은 에러가 없다는 뜻이고
 	// 다른 숫자는 exit code를 보여줌
-	os.Exit(0)
+	runtime.Goexit()
 }
 
 func run(mode string, port int) {
