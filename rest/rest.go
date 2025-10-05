@@ -51,6 +51,11 @@ func documentation(w http.ResponseWriter, r *http.Request) {
 			Payload:     "data:string",
 		},
 		{
+			URL:         url("/status"),
+			Method:      "GET",
+			Description: "See the Status of the Blockchain",
+		},
+		{
 			URL:         url("/blocks/{hash}"),
 			Method:      "GET",
 			Description: "See A Block",
@@ -91,6 +96,10 @@ func block(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func status(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(blockchain.Blockchain())
+}
+
 func jsonContentTypeMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
@@ -109,6 +118,7 @@ func Start(aPort int) {
 	router.HandleFunc("/", documentation).Methods("GET")
 	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
 	router.HandleFunc("/blocks/{hash:[a-f0-9]+}", block).Methods("GET")
+	router.HandleFunc("/status", status).Methods("GET")
 	fmt.Printf("Listening on http://localhost%s\n", port)
 	// ListenAndServe에 커스텀 MUX를 사용하고 있다는걸 알려줘야해서
 	// 생성한 MUX handler를 두번째 인자로 전달
